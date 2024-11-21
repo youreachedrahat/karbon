@@ -49,7 +49,7 @@ export default function WalletConnectors(props: { onConnectWallet: (wallet: Wall
           <Button
             variant="bordered"
             className="text-sm font-normal text-default-600 bg-default-100"
-            startContent={selectedwallet && <img className="w-7" src={selectedwallet.icon} />}
+            startContent={selectedwallet && <img className="w-7" src={selectedwallet.icon} alt="I"/>}
           >
             {selectedwallet ? (
               balance ? (<>₳ {balance.toFixed(2)} </>) : "Connecting..."
@@ -68,7 +68,7 @@ export default function WalletConnectors(props: { onConnectWallet: (wallet: Wall
                 classNames={{
                   base: "rounded-sm", // change arrow background
                 }}
-                startContent={<img className="w-7" src={selectedwallet.icon} />}
+                startContent={<img className="w-7" src={selectedwallet.icon} alt="I" />}
                 onClick={() => {
                   // onConnectWallet(wallet);
                   setSelectedWallet(undefined);
@@ -88,7 +88,7 @@ export default function WalletConnectors(props: { onConnectWallet: (wallet: Wall
                   classNames={{
                     base: "rounded-sm", // change arrow background
                   }}
-                  startContent={<img className="w-7" src={wallet.icon} />}
+                  startContent={<img className="w-7" src={wallet.icon} alt="I"/>}
                   onClick={() => {
                     onConnectWallet(wallet);
                     setSelectedWallet(wallet);

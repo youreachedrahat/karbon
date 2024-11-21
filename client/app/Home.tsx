@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-
-import WalletConnectors from "@/components/WalletConnectors";
 import Dashboard from "@/components/Dashboard";
 
 import { Address, Blockfrost, Lucid, LucidEvolution, Network } from "@lucid-evolution/lucid";
@@ -78,7 +76,7 @@ export default function Home() {
       const totalLovelace = utxos.reduce((sum, utxo) => {
         return sum + (utxo.assets.lovelace || 0n);
       }, 0n);
-      setBalance(Number(totalLovelace / 1_000_000n))
+      setBalance(Number(totalLovelace / 1_000_000n));
       setAddress(address);
     } catch (error) {
       handleError(error);
