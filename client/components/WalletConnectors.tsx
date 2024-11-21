@@ -28,12 +28,6 @@ export default function WalletConnectors(props: { onConnectWallet: (wallet: Wall
     setWallets(wallets);
   }, []);
 
-  ///////////////////////////////////////////////////////////////////////////////////
-
-  if (!wallets) return <span className="uppercase">Browsing Cardano Wallets</span>;
-
-  if (!wallets.length) return <span className="uppercase">No Cardano Wallet</span>;
-
   return (
     <div className="flex flex-wrap gap-2">
 
@@ -41,64 +35,82 @@ export default function WalletConnectors(props: { onConnectWallet: (wallet: Wall
       <Dropdown
         showArrow
         classNames={{
-          base: "before:bg-default-200", // change arrow background
-          content: " py-1 px-1 border border-default-200 bg-gradient-to-br from-white to-default-200 dark:from-default-50 dark:to-black",
+          base: "before:bg-default-200 ", // change arrow background
+          content: "py-1 px-1 border border-default-200 bg-gradient-to-br from-white to-default-200 dark:from-default-50 dark:to-black",
         }}
       >
-        <DropdownTrigger className="rounded-sm">
+        <DropdownTrigger className="rounded-small">
           <Button
             variant="bordered"
             className="text-sm font-normal text-default-600 bg-default-100"
-            startContent={selectedwallet && <img className="w-7" src={selectedwallet.icon} alt="I"/>}
+            startContent={selectedwallet && <img className="w-6" src={selectedwallet.icon} alt="I" />}
           >
             {selectedwallet ? (
-              balance ? (<>₳ {balance.toFixed(2)} </>) : "Connecting..."
+              balance ? (<>₳{balance.toFixed(2)} </>) : "Connecting..."
             ) : "Connect Wallet"}
           </Button>
         </DropdownTrigger>
-        <DropdownMenu variant="faded" aria-label="Dropdown menu with description"
+        <DropdownMenu variant="faded" aria-label="Wallet connector dropdown menu">
+          <DropdownSection>
 
-        >
-          {selectedwallet ?
-            <DropdownSection>
-
-              <DropdownItem
-                key="0"
-                // className="rounded"
-                classNames={{
-                  base: "rounded-sm", // change arrow background
-                }}
-                startContent={<img className="w-7" src={selectedwallet.icon} alt="I" />}
-                onClick={() => {
-                  // onConnectWallet(wallet);
-                  setSelectedWallet(undefined);
-                  resetLucid()
-                }}
-              >
-                Disconnect
-              </DropdownItem>
-
-            </DropdownSection>
-            :
-            <DropdownSection>
-              {wallets.map((wallet, w) => (
+            {!wallets ?
                 <DropdownItem
-                  key={`wallet.${w}`}
-                  // className="rounded"
+                  key="0"
                   classNames={{
-                    base: "rounded-sm", // change arrow background
-                  }}
-                  startContent={<img className="w-7" src={wallet.icon} alt="I"/>}
-                  onClick={() => {
-                    onConnectWallet(wallet);
-                    setSelectedWallet(wallet);
+                    base: "rounded-small text-center flex justify-center items-center",
                   }}
                 >
-                  {(wallet.name).toUpperCase()}
+                  <>Browsing Cardano Wallet</>
                 </DropdownItem>
-              ))}
-            </DropdownSection>
-          }
+              : (
+                !wallets.length ?
+                    <DropdownItem
+                      key="0"
+                      classNames={{
+                        base: "rounded-small text-center flex justify-center items-center",
+                      }}
+                    >
+                      <>No Cardano Wallets</>
+                    </DropdownItem>
+                  : (
+                    !selectedwallet ?
+                        wallets.map((wallet, w) => (
+                          <DropdownItem
+                            key={`wallet.${w}`}
+                            classNames={{
+                              base: "rounded-small space-x-2", // change arrow background
+                            }}
+                            startContent={<img className="w-6" src={wallet.icon} alt="I" />}
+                            showDivider={w !== wallets.length - 1}
+                            onClick={() => {
+                              onConnectWallet(wallet);
+                              setSelectedWallet(wallet);
+                            }}
+                          >
+                            {(wallet.name).toUpperCase()}
+                          </DropdownItem>
+                        ))
+                      :
+                        <DropdownItem
+                          key="0"
+                          classNames={{
+                            base: "rounded-small space-x-2",
+                          }}
+                          startContent={<img className="w-6" src={selectedwallet.icon} alt="I" />}
+                          onClick={() => {
+                            setSelectedWallet(undefined);
+                            resetLucid()
+                          }}
+                        >
+                          Disconnect
+                        </DropdownItem>
+
+                  )
+              )
+
+            }
+
+          </DropdownSection>
         </DropdownMenu>
       </Dropdown>
     </div>
