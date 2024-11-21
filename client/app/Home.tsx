@@ -90,14 +90,7 @@ export default function Home() {
       <div className="flex justify-center overflow-hidden">
         <div className="flex flex-col gap-2 overflow-hidden">
           {lucid ? (
-            address ? (
-              // wallet connected: Show Dashboard
               <Dashboard address={address} lucid={lucid} onError={handleError} setActionResult={setResult} />
-            ) : (
-              // no wallet connected yet: Show Wallet button List
-              // <WalletConnectors onConnectWallet={onConnectWallet} />
-              <>kk</>
-            )
           ) : (
             <span className="uppercase">Initializing Lucid</span>
           )}
