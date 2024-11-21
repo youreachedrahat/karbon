@@ -5,6 +5,7 @@ import Dashboard from "@/components/Dashboard";
 
 import { Address, Blockfrost, Lucid, LucidEvolution, Network } from "@lucid-evolution/lucid";
 import { Wallet } from "@/types/cardano";
+import { Navbar } from "@/components/navbar";
 
 export default function Home() {
   const NETWORK = process.env.NEXT_PUBLIC_CARDANO_NETWORK as Network;
@@ -13,7 +14,8 @@ export default function Home() {
   const BLOCKFROST = new Blockfrost(BF_URL, BF_PID);
 
   const [lucid, setLucid] = useState<LucidEvolution>();
-  const [address, setAddress] = useState<Address>(""); // Address = string; eg. "addr_..."
+  const [address, setAddress] = useState<Address>("");
+  const [balance, setBalance] = useState<Number>();
   const [result, setResult] = useState("");
 
   useEffect(() => {
@@ -21,6 +23,14 @@ export default function Home() {
   }, []);
 
   //#region utils
+  function resetLucid() {
+    setLucid(undefined)
+    setBalance(undefined)
+    setAddress("")
+    Lucid(BLOCKFROST, NETWORK).then(setLucid).catch(handleError);
+  }
+
+
   function handleError(error: any) {
     const { info, message } = error;
 
@@ -64,6 +74,11 @@ export default function Home() {
       lucid.selectWallet.fromAPI(api);
 
       const address = await lucid.wallet().address();
+      const utxos = await lucid.utxosAt(address);
+      const totalLovelace = utxos.reduce((sum, utxo) => {
+        return sum + (utxo.assets.lovelace || 0n);
+      }, 0n);
+      setBalance(Number(totalLovelace / 1_000_000n))
       setAddress(address);
     } catch (error) {
       handleError(error);
@@ -72,21 +87,25 @@ export default function Home() {
   //#endregion
 
   return (
-    <div className="flex justify-center overflow-hidden">
-      <div className="flex flex-col gap-2 overflow-hidden">
-        {lucid ? (
-          address ? (
-            // wallet connected: Show Dashboard
-            <Dashboard address={address} lucid={lucid} onError={handleError} setActionResult={setResult} />
+    <>
+      <Navbar onConnectWallet={onConnectWallet} balance={balance} resetLucid={resetLucid} />
+      <div className="flex justify-center overflow-hidden">
+        <div className="flex flex-col gap-2 overflow-hidden">
+          {lucid ? (
+            address ? (
+              // wallet connected: Show Dashboard
+              <Dashboard address={address} lucid={lucid} onError={handleError} setActionResult={setResult} />
+            ) : (
+              // no wallet connected yet: Show Wallet button List
+              // <WalletConnectors onConnectWallet={onConnectWallet} />
+              <>kk</>
+            )
           ) : (
-            // no wallet connected yet: Show Wallet button List
-            <WalletConnectors onConnectWallet={onConnectWallet} />
-          )
-        ) : (
-          <span className="uppercase">Initializing Lucid</span>
-        )}
-        <span className="font-mono break-words whitespace-pre-wrap">{result}</span>
+            <span className="uppercase">Initializing Lucid</span>
+          )}
+          <span className="font-mono break-words whitespace-pre-wrap">{result}</span>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
