@@ -90,7 +90,7 @@ export default function Home() {
       <div className="flex justify-center overflow-hidden">
         <div className="flex flex-col gap-2 overflow-hidden">
           {lucid ? (
-              <Dashboard address={address} lucid={lucid} onError={handleError} setActionResult={setResult} />
+            <Dashboard address={address} lucid={lucid} onError={handleError} setActionResult={setResult} />
           ) : (
             <span className="uppercase">Initializing Lucid</span>
           )}

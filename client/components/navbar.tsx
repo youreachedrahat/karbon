@@ -12,24 +12,23 @@ import NextLink from "next/link";
 import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
-import { Logo } from "@/components/icons";
+import { Logo, TalendroLogo } from "@/components/icons";
 import WalletConnectors from "./WalletConnectors";
 import { Wallet } from "@/types/cardano";
 import { useState } from "react";
-import Link from "next/link";
 
 export const Navbar = (props: { onConnectWallet: (wallet: Wallet) => Promise<void>, balance: Number | undefined, resetLucid: () => void }) => {
   const { onConnectWallet, resetLucid, balance } = props;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <NextUINavbar maxWidth="xl" position="sticky" onMenuOpenChange={setIsMenuOpen} shouldHideOnScroll isBordered>
+    <NextUINavbar maxWidth="xl" onMenuOpenChange={setIsMenuOpen} shouldHideOnScroll isBordered className="font-comfortaa">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
 
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo />
-            <p className="font-bold text-inherit">Talendro</p> {/*  font Comfortaa Bold Alt1 */}
+            <TalendroLogo/>
           </NextLink>
         </NavbarBrand>
 

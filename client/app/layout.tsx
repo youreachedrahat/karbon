@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
-import { fontSans } from "@/config/fonts";
+import { fontSans, fontComfortaa } from "@/config/fonts";
 
 export const metadata: Metadata = {
   title: {
@@ -29,7 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html suppressHydrationWarning lang="en">
       <head />
-      <body className={clsx("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
+      <body className={clsx(
+        "min-h-screen bg-background font-sans antialiased",
+        fontSans.variable,
+        fontComfortaa.variable 
+      )}>
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
             <main className="container mx-auto  flex-grow">{children}</main>
