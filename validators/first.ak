@@ -1,5 +1,5 @@
 validator alwaystrue {
-  spend(datum, redeemer, oref, tx) {
+  spend(_datum, _redeemer, _oref, _tx) {
     True
   }
 

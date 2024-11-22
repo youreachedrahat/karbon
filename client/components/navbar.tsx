@@ -1,3 +1,4 @@
+"use client"
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -13,12 +14,13 @@ import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
 import { Logo, TalendroLogo } from "@/components/icons";
-import WalletConnectors from "./WalletConnectors";
+import WalletConnectors from "./WalletConnector/WalletConnectors";
 import { Wallet } from "@/types/cardano";
 import { useState } from "react";
+import WalletClient from "./WalletConnector/WalletClient";
 
-export const Navbar = (props: { onConnectWallet: (wallet: Wallet) => Promise<void>, balance: Number | undefined, resetLucid: () => void }) => {
-  const { onConnectWallet, resetLucid, balance } = props;
+export const Navbar = ()=> {
+  // const { onConnectWallet, resetLucid, balance } = props;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -57,7 +59,8 @@ export const Navbar = (props: { onConnectWallet: (wallet: Wallet) => Promise<voi
           ))}
         </ul>
         <NavbarItem className="hidden md:flex">
-          <WalletConnectors onConnectWallet={onConnectWallet} balance={balance} resetLucid={resetLucid} />
+          {/* <WalletConnectors /> */}
+          <WalletClient/>
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end" className="sm:hidden">
@@ -82,7 +85,8 @@ export const Navbar = (props: { onConnectWallet: (wallet: Wallet) => Promise<voi
           </NavbarMenuItem>
         ))}
         <NavbarMenuItem className="my-10">
-          <WalletConnectors onConnectWallet={onConnectWallet} balance={balance} resetLucid={resetLucid} />
+          {/* <WalletConnectors /> */}
+          <WalletClient/>
         </NavbarMenuItem>
       </NavbarMenu>
     </NextUINavbar>

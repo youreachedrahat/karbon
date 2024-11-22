@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import Dashboard from "@/components/Dashboard";
 
 import { Address, Blockfrost, Lucid, LucidEvolution, Network } from "@lucid-evolution/lucid";
-import { Wallet } from "@/types/cardano";
-import { Navbar } from "@/components/navbar";
 
 export default function Home() {
   const NETWORK = process.env.NEXT_PUBLIC_CARDANO_NETWORK as Network;
@@ -12,21 +10,11 @@ export default function Home() {
   const BLOCKFROST = new Blockfrost(BF_URL, BF_PID);
 
   const [lucid, setLucid] = useState<LucidEvolution>();
-  const [address, setAddress] = useState<Address>("");
-  const [balance, setBalance] = useState<Number>();
   const [result, setResult] = useState("");
 
   useEffect(() => {
     Lucid(BLOCKFROST, NETWORK).then(setLucid).catch(handleError);
   }, []);
-
-  //#region utils
-  function resetLucid() {
-    setLucid(undefined)
-    setBalance(undefined)
-    setAddress("")
-    Lucid(BLOCKFROST, NETWORK).then(setLucid).catch(handleError);
-  }
 
 
   function handleError(error: any) {
@@ -64,33 +52,15 @@ export default function Home() {
    * eg. empty address == not connected; has address == connected;
    * @param wallet
    */
-  async function onConnectWallet(wallet: Wallet) {
-    try {
-      if (!lucid) throw "Uninitialized Lucid";
-
-      const api = await wallet.enable();
-      lucid.selectWallet.fromAPI(api);
-
-      const address = await lucid.wallet().address();
-      const utxos = await lucid.utxosAt(address);
-      const totalLovelace = utxos.reduce((sum, utxo) => {
-        return sum + (utxo.assets.lovelace || 0n);
-      }, 0n);
-      setBalance(Number(totalLovelace / 1_000_000n));
-      setAddress(address);
-    } catch (error) {
-      handleError(error);
-    }
-  }
+  
   //#endregion
 
   return (
     <>
-      <Navbar onConnectWallet={onConnectWallet} balance={balance} resetLucid={resetLucid} />
       <div className="flex justify-center overflow-hidden">
         <div className="flex flex-col gap-2 overflow-hidden">
           {lucid ? (
-            <Dashboard address={address} lucid={lucid} onError={handleError} setActionResult={setResult} />
+            <Dashboard onError={handleError} setActionResult={setResult} />
           ) : (
             <span className="uppercase">Initializing Lucid</span>
           )}
