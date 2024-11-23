@@ -1,20 +1,24 @@
 import { Accordion, AccordionItem } from "@nextui-org/accordion";
 import { Button } from "@nextui-org/button";
-import { lucidInit } from "./WalletConnector/WalletConnectors";
 import { Data, TxSignBuilder, validatorToAddress } from "@lucid-evolution/lucid";
 import { spendingValidator } from "@/components/compiled/Validators";
-
-
+import { useLucid, usingEmulator } from "@/config/lucid";
+import { emulator } from "@/config/emulator";
 
 export default function Dashboard(props: {
   setActionResult: (result: string) => void;
   onError: (error: any) => void;
 }) {
   const { setActionResult, onError } = props;
-
+  const lucid = useLucid()
   async function submitTx(tx: TxSignBuilder) {
     const txSigned = await tx.sign.withWallet().complete();
     const txHash = await txSigned.submit();
+
+    if (usingEmulator) {
+      emulator.awaitTx(txHash)
+      emulator.log()
+    }
 
     return txHash;
   }
@@ -25,7 +29,7 @@ export default function Dashboard(props: {
   const actions: Record<string, ActionGroup> = {
     AlwaysTrue: {
       deposit: async () => {
-        const lucid = lucidInit.value
+        const lucid = useLucid()
         if (!lucid) throw ("lucid not Initailized")
         try {
           const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
@@ -47,7 +51,7 @@ export default function Dashboard(props: {
       },
 
       withdrawal: async () => {
-        const lucid = lucidInit.value
+        const lucid = useLucid()
         if (!lucid) throw "lucid not Initailized"
         try {
           const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
@@ -69,8 +73,9 @@ export default function Dashboard(props: {
     },
   };
 
+
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 py-2">
       <Accordion variant="splitted">
         {/* Always True */}
         <AccordionItem key="1" aria-label="Accordion 1" title="Always True">

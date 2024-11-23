@@ -3,31 +3,22 @@ import { useEffect, useMemo, useState } from "react";
 import { Wallet } from "@/types/cardano";
 import { Button } from "@nextui-org/button";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, cn, DropdownSection } from "@nextui-org/react";
-import { signal } from "@preact/signals-react";
-import { Blockfrost, Lucid, LucidEvolution, Network } from "@lucid-evolution/lucid";
-
-const NETWORK = process.env.NEXT_PUBLIC_CARDANO_NETWORK as Network;
-const BF_URL = `${process.env.NEXT_PUBLIC_BF_URL}`;
-const BF_PID = `${process.env.NEXT_PUBLIC_BF_PID}`;
-const BLOCKFROST = new Blockfrost(BF_URL, BF_PID);
-
-export const lucidInit = signal<LucidEvolution | undefined>(undefined);
-
-Lucid(BLOCKFROST, NETWORK)
-  .then((lucidInstance) => {
-    lucidInit.value = lucidInstance; // Update the signal value
-  })
-  .catch((error) => {
-    console.error("Failed to initialize Lucid:", error);
-  });
-
-
+import { Address, Blockfrost, EmulatorAccount, Lucid, Network } from "@lucid-evolution/lucid";
+import { initializeLucid, useLucid } from "@/config/lucid";
+import { accountA, accountB, accountC, accountD } from "@/config/emulator";
 
 export default function WalletConnectors() {
+  const lucid = useLucid()
   const [wallets, setWallets] = useState<Wallet[]>();
   const [selectedwallet, setSelectedWallet] = useState<Wallet | undefined>();
   const [balance, setBalance] = useState<Number>();
-
+  const [emulatorAddress, setEmulatorAddress] = useState<Address>();
+  const [emulatoraccounts, setEmulatoraccounts] = useState({
+    accountA: accountA,
+    accountB: accountB,
+    accountC: accountC,
+    accountD: accountD,
+  });
 
   useEffect(() => {
     const wallets: Wallet[] = [];
@@ -48,7 +39,7 @@ export default function WalletConnectors() {
   }, []);
 
   async function onWalletConnect(wallet: Wallet) {
-    const lucid = lucidInit.value
+    const lucid = useLucid()
     setSelectedWallet(wallet)
     try {
       if (!lucid) throw "Uninitialized Lucid";
@@ -68,16 +59,24 @@ export default function WalletConnectors() {
   }
 
   function onWalletDisconnect() {
-    Lucid(BLOCKFROST, NETWORK)
-      .then((lucidInstance) => {
-        lucidInit.value = lucidInstance;
-      })
-      .catch((error) => {
-        console.error("Failed to initialize Lucid:", error);
-      });
+    initializeLucid()
     setBalance(undefined)
     setSelectedWallet(undefined);
   }
+
+  async function selectEmulatorWallet(account: EmulatorAccount) {
+    if (!lucid) throw "lucid not initialized"
+    lucid.selectWallet.fromSeed(account.seedPhrase);
+    const address = await lucid.wallet().address();
+    const utxos = await lucid?.utxosAt(address);
+    const totalLovelace = utxos.reduce((sum, utxo) => {
+      return sum + (utxo.assets.lovelace || 0n);
+    }, 0n);
+    setEmulatorAddress(address)
+    setBalance(Number(totalLovelace / 1_000_000n));
+  }
+
+  
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -94,66 +93,82 @@ export default function WalletConnectors() {
           <Button
             variant="bordered"
             className="text-sm font-normal text-default-600 bg-default-100"
-            startContent={selectedwallet && <img className="w-6" src={selectedwallet.icon} alt="I" />}
+            startContent={selectedwallet && <img className="w-6" src={selectedwallet.icon} alt="X" />}
           >
             {selectedwallet ? (
-              balance ? (<>₳{balance.toFixed(2)} </>) : "Connecting..."
-            ) : "Connect Wallet"}
+              balance ? (<>₳ {balance.toFixed(2)} </>) : "Connecting..."
+            ) :
+              emulatorAddress ? <> {emulatorAddress.slice(0, 15)}...{emulatorAddress.slice(-3)}</> : "Connect Wallet"}
           </Button>
         </DropdownTrigger>
         <DropdownMenu variant="faded" aria-label="Wallet connector dropdown menu">
           <DropdownSection>
+            {lucid?.config().network === "Custom" ?
+              Object.entries(emulatoraccounts).map(([key, account]) => (
+                <DropdownItem
+                  key={key}
+                  classNames={{
+                    base: "rounded-small text-center flex justify-center items-center",
+                  }}
+                  onClick={() => selectEmulatorWallet(account)}
+                  description={`${account.address.slice(0, 15)}...${account.address.slice(-3)}`}
+                >
+                  {key}
+                </DropdownItem>
+              ))
+              :
 
-            {!wallets ?
-              <DropdownItem
-                key="0"
-                classNames={{
-                  base: "rounded-small text-center flex justify-center items-center",
-                }}
-              >
-                <>Browsing Cardano Wallet</>
-              </DropdownItem>
-              : (
-                !wallets.length ?
-                  <DropdownItem
-                    key="0"
-                    classNames={{
-                      base: "rounded-small text-center flex justify-center items-center",
-                    }}
-                  >
-                    <>No Cardano Wallets</>
-                  </DropdownItem>
-                  : (
-                    !selectedwallet ?
-                      wallets.map((wallet, w) => (
+              !wallets ?
+                <DropdownItem
+                  key="0"
+                  classNames={{
+                    base: "rounded-small text-center flex justify-center items-center",
+                  }}
+                >
+                  <>Browsing Cardano Wallet</>
+                </DropdownItem>
+                : (
+                  !wallets.length ?
+                    <DropdownItem
+                      key="0"
+                      classNames={{
+                        base: "rounded-small text-center flex justify-center items-center",
+                      }}
+                    >
+                      <>No Cardano Wallets</>
+                    </DropdownItem>
+                    : (
+                      !selectedwallet ?
+                        wallets.map((wallet, w) => (
+                          <DropdownItem
+                            key={`wallet.${w}`}
+                            classNames={{
+                              base: "rounded-small space-x-2", // change arrow background
+                            }}
+                            startContent={<img className="w-6" src={wallet.icon} alt="X" />}
+                            showDivider={w !== wallets.length - 1}
+                            onClick={() => {
+                              onWalletConnect(wallet)
+                            }}
+                          >
+                            {(wallet.name).toUpperCase()}
+                          </DropdownItem>
+                        ))
+                        :
                         <DropdownItem
-                          key={`wallet.${w}`}
+                          key="0"
                           classNames={{
-                            base: "rounded-small space-x-2", // change arrow background
+                            base: "rounded-small space-x-2",
                           }}
-                          startContent={<img className="w-6" src={wallet.icon} alt="I" />}
-                          showDivider={w !== wallets.length - 1}
-                          onClick={() => {
-                            onWalletConnect(wallet)
-                          }}
+                          startContent={<img className="w-6" src={selectedwallet.icon} alt="X" />}
+                          onClick={onWalletDisconnect}
                         >
-                          {(wallet.name).toUpperCase()}
+                          Disconnect
                         </DropdownItem>
-                      ))
-                      :
-                      <DropdownItem
-                        key="0"
-                        classNames={{
-                          base: "rounded-small space-x-2",
-                        }}
-                        startContent={<img className="w-6" src={selectedwallet.icon} alt="I" />}
-                        onClick={onWalletDisconnect}
-                      >
-                        Disconnect
-                      </DropdownItem>
 
-                  )
-              )
+                    )
+                )
+
 
             }
 
