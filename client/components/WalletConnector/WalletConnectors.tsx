@@ -12,6 +12,7 @@ const BF_PID = `${process.env.NEXT_PUBLIC_BF_PID}`;
 const BLOCKFROST = new Blockfrost(BF_URL, BF_PID);
 
 export const lucidInit = signal<LucidEvolution | undefined>(undefined);
+
 Lucid(BLOCKFROST, NETWORK)
   .then((lucidInstance) => {
     lucidInit.value = lucidInstance; // Update the signal value
@@ -19,15 +20,16 @@ Lucid(BLOCKFROST, NETWORK)
   .catch((error) => {
     console.error("Failed to initialize Lucid:", error);
   });
+
+
+
 export default function WalletConnectors() {
   const [wallets, setWallets] = useState<Wallet[]>();
   const [selectedwallet, setSelectedWallet] = useState<Wallet | undefined>();
   const [balance, setBalance] = useState<Number>();
 
 
-
   useEffect(() => {
-    console.log(lucidInit.value)
     const wallets: Wallet[] = [];
 
     const { cardano } = window;
