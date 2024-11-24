@@ -31,7 +31,7 @@ export function initializeLucid() {
     }
 }
 initializeLucid();
-export function useLucid() {
+export function callLucid() {
     const lucid = lucidInit.value
     if (!lucid) initializeLucid()
     // if (!lucid) throw "lucid not Initailized"

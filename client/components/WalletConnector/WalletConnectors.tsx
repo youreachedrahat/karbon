@@ -4,11 +4,11 @@ import { Wallet } from "@/types/cardano";
 import { Button } from "@nextui-org/button";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, cn, DropdownSection } from "@nextui-org/react";
 import { Address, Blockfrost, EmulatorAccount, Lucid, Network } from "@lucid-evolution/lucid";
-import { initializeLucid, useLucid } from "@/config/lucid";
+import { initializeLucid, callLucid } from "@/config/lucid";
 import { accountA, accountB, accountC, accountD } from "@/config/emulator";
 
 export default function WalletConnectors() {
-  const lucid = useLucid()
+  const lucid = callLucid()
   const [wallets, setWallets] = useState<Wallet[]>();
   const [selectedwallet, setSelectedWallet] = useState<Wallet | undefined>();
   const [balance, setBalance] = useState<Number>();
@@ -39,8 +39,9 @@ export default function WalletConnectors() {
   }, []);
 
   async function onWalletConnect(wallet: Wallet) {
-    const lucid = useLucid()
     setSelectedWallet(wallet)
+    const lucid = callLucid()
+
     try {
       if (!lucid) throw "Uninitialized Lucid";
 
@@ -76,7 +77,7 @@ export default function WalletConnectors() {
     setBalance(Number(totalLovelace / 1_000_000n));
   }
 
-  
+
 
   return (
     <div className="flex flex-wrap gap-2">

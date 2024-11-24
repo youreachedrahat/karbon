@@ -2,7 +2,7 @@ import { Accordion, AccordionItem } from "@nextui-org/accordion";
 import { Button } from "@nextui-org/button";
 import { Data, TxSignBuilder, validatorToAddress } from "@lucid-evolution/lucid";
 import { spendingValidator } from "@/components/compiled/Validators";
-import { useLucid, usingEmulator } from "@/config/lucid";
+import { callLucid, usingEmulator } from "@/config/lucid";
 import { emulator } from "@/config/emulator";
 
 export default function Dashboard(props: {
@@ -10,7 +10,7 @@ export default function Dashboard(props: {
   onError: (error: any) => void;
 }) {
   const { setActionResult, onError } = props;
-  const lucid = useLucid()
+  const lucid = callLucid()
   async function submitTx(tx: TxSignBuilder) {
     const txSigned = await tx.sign.withWallet().complete();
     const txHash = await txSigned.submit();
@@ -29,7 +29,8 @@ export default function Dashboard(props: {
   const actions: Record<string, ActionGroup> = {
     AlwaysTrue: {
       deposit: async () => {
-        const lucid = useLucid()
+  const lucid = callLucid()
+
         if (!lucid) throw ("lucid not Initailized")
         try {
           const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
@@ -51,7 +52,8 @@ export default function Dashboard(props: {
       },
 
       withdrawal: async () => {
-        const lucid = useLucid()
+  const lucid = callLucid()
+
         if (!lucid) throw "lucid not Initailized"
         try {
           const validatorAddress = validatorToAddress(lucid.config().network, spendingValidator);
