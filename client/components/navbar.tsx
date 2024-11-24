@@ -30,7 +30,7 @@ export const Navbar = ()=> {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo />
-            Aiken_Lucid_Template
+            Aiken Lucid Template
           </NextLink>
         </NavbarBrand>
 
