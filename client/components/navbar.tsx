@@ -13,7 +13,7 @@ import NextLink from "next/link";
 import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
-import { Logo, TalendroLogo } from "@/components/icons";
+import { Logo } from "@/components/icons";
 import WalletConnectors from "./WalletConnector/WalletConnectors";
 import { Wallet } from "@/types/cardano";
 import { useState } from "react";
@@ -30,7 +30,7 @@ export const Navbar = ()=> {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo />
-            <TalendroLogo/>
+            Aiken_Lucid_Template
           </NextLink>
         </NavbarBrand>
 
