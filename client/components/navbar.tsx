@@ -14,7 +14,7 @@ import NextLink from "next/link";
 import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
-import { GithubIcon, Logo, TalendroLogo } from "@/components/icons";
+import { GithubIcon, Logo } from "@/components/icons";
 import { useState } from "react";
 import WalletClient from "./WalletConnector/WalletClient";
 import { ThemeSwitch } from "./theme-switch";
@@ -30,7 +30,7 @@ export const Navbar = () => {
         <NavbarBrand as="li" className="gap-3 max-w-fit">
           <NextLink className="flex justify-start items-center gap-1" href="/">
             <Logo />
-            <TalendroLogo />
+            Aiken Lucid Template
           </NextLink>
         </NavbarBrand>
 
