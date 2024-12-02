@@ -5,6 +5,7 @@ use modules/functions.{
 }
 use modules/types.{Action}
 
+// TODO:  separate spend and mint handler
 validator identification_nft(o_ref: OutputReference) {
   mint(redeemer: Action, policy_id: PolicyId, tx: Transaction) {
     when redeemer is {
