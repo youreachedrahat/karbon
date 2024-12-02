@@ -1,3 +1,4 @@
+use aiken/collection/list
 use cardano/assets.{PolicyId}
 use cardano/transaction.{InlineDatum, Output, Transaction, find_script_outputs}
 use modules/functions.{
@@ -31,7 +32,10 @@ validator validator_contract_mint(config_nft: PolicyId) {
         expect ref_datum: ConfigDatum = ref_input_datum
 
         expect [script_output]: List<Output> =
-          find_script_outputs(outputs, policy_id)
+          list.filter(
+            outputs,
+            fn(output) { output.address == ref_datum.spend_address },
+          )
         and {
           must_send_fees_to_address(outputs, ref_datum),
           // ref input -- address and fees (ref input match with nft policyId: _config_nft)
