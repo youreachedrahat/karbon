@@ -31,7 +31,7 @@ validator validator_contract_mint(config_nft: PolicyId) {
         expect InlineDatum(ref_input_datum) = ref_input.output.datum
         expect ref_datum: ConfigDatum = ref_input_datum
 
-        expect [script_output]: List<Output> =
+        expect [script_output] =
           list.filter(
             outputs,
             fn(output) { output.address == ref_datum.spend_address },
